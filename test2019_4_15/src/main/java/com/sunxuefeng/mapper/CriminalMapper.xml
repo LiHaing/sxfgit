@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunxuefeng.mapper.CriminalMapper">
+
+	<!-- List<Criminal> listCriminal(@Param("likeName")String likeName); -->
+	<select id="listCriminal" resultType="Criminal">
+		select * from tb_criminal
+		<where>
+			<if test="likeName != null and likeName != '' ">
+				cname like "%" #{likeName} "%"
+			</if>
+		</where>
+		limit #{limit1},#{limit2}
+	</select>
+
+
+	<!--int getTotalData(String likeName); -->
+	<select id="getTotalData" resultType="int">
+		select count(*) from tb_criminal
+		<where>
+			<if test="likeName != null and likeName != '' ">
+				cname like "%" #{likeName} "%"
+			</if>
+		</where>
+	</select>
+
+	<!-- Criminal findById(Integer cid); -->
+	<select id="findById" resultType="Criminal">
+		select * from tb_criminal
+		<where>
+			<if test="cid != null and cid != 0 ">
+				cid = #{cid}
+			</if>
+		</where>
+	</select>
+
+	<!-- 修改 void upd(Criminal c); -->
+	<update id="upd">
+		update tb_criminal set
+		cname=#{cname},
+		card_no=#{card_no},
+		age=#{age},
+		sex=#{sex},
+		tb_criminal.desc=#{desc}
+		where cid=#{cid}
+	</update>
+
+	<!-- 添加:void add(Criminal c); -->
+	<insert id="add">
+		insert into
+		tb_criminal(cname,card_no,age,sex,tb_criminal.desc)
+		values(#{cname},#{card_no},#{age},#{sex},#{desc})
+	</insert>
+	<!-- 删除:void del(Integer cid); -->
+	<delete id="del">
+		delete from tb_criminal where cid=#{cid}
+
+	</delete>
+
+</mapper>
