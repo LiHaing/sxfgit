@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 开启注解扫描 -->
+	<context:component-scan base-package="com.yuki">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+
+	<!-- 配置连接数据库的数据源 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql:///sxf?characterEncoding=utf-8" />
+		<property name="username" value="root" />
+		<property name="password" value="456" />
+	</bean>
+
+	<!-- 配置mybatis sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 给工程注入数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 加载核心配置文件 -->
+		<property name="configLocation" value="classpath:mybatis.xml" />
+	</bean>
+
+	<!-- 加载mybatis的映射文件 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- basePackage :mapper接口所在的包 -->
+		<property name="basePackage" value="com.yuki.mapper"></property>
+	</bean>
+
+
+	<!-- 配置jdbc事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- 配置事务 transaction-manager:表示关联的事务管理器是谁 -->
+	<tx:advice transaction-manager="transactionManager" id="txAdvice">
+		<!-- 事务属性配置 -->
+		<tx:attributes>
+			<!-- 以find.select get开头的方法为只读事务，用来提高数据库的性能 -->
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="select*" read-only="true" />
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="load*" read-only="true" />
+			<tx:method name="list*" read-only="true" />
+			<!-- 其他的方法为默认事务 -->
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 配置aop -->
+	<aop:config>
+		<!-- 配置切点表达式 -->
+		<aop:pointcut expression="execution(* com.yuki.service.impl.*.*(..))"
+			id="pointcut" />
+		<!-- 关联事务 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut" />
+	</aop:config>
+
+
+
+</beans>
+
+
+
+
+
+
+

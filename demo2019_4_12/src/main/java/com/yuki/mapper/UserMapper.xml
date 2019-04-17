@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuki.mapper.UserMapper">
+
+	<!-- List listMyUsers(String likeName); -->
+	<select id="listMyUsers" resultType="map">
+		select * from myuser 
+		<where>
+			<if test="likeName != null and likeName != '' ">
+				username like "%" #{likeName} "%"
+			</if>
+		</where>
+		limit #{limit1},#{limit2}
+	</select>
+	
+	<!-- int getTotalData(String likeName); -->
+	<select id="getTotalData" resultType="int">
+		select count(*) from myuser 
+		<where>
+			<if test="likeName != null and likeName != '' ">
+				username like "%" #{likeName} "%"
+			</if>
+		</where>
+	</select>
+</mapper>
